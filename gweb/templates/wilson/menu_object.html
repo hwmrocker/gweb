@@ -1,0 +1,11 @@
+{% for item in menu %}
+{% spaceless %}
+<div class="{{item.menu_object.html_class|default:"menuitem"}}{% if item.menu_object.url.url in request.path %} selected{% endif %}" >
+    <a href="{% if item.menu_object.is_intern %}/{% endif %}{% filter force_escape %}{% firstof item.menu_object.url.url item.menu_object.extern_url %}{% endfilter %}" {% if not item.menu_object.is_intern %} target="_new"{% endif %} >
+        <div class="menulogo {{item.menu_object.logo|default:item.logo}}"></div>
+        <!--[if IE]><div class="menutext ie" lang="{{item.menu_object.url.page.i18n}}"> <span>{{item.menu_object.title}}</span> </div><![endif]-->
+        <![if !IE]><div class="menutext " lang="{{item.menu_object.url.page.i18n}}"> <span style="font-size: {{item.menu_object.fontsize}}pt">{{item.menu_object.title}}</span> </div><![endif]>
+    </a>
+</div>
+{% endspaceless %}
+{% endfor %}{# item in menu #}

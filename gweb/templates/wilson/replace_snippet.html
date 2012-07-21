@@ -1,0 +1,20 @@
+{% load i18n %}
+<input id="{{tag.id}}" type="hidden" value="{{query}}">
+{{current_count}}
+<div class="remove"><a href="#" onclick="return remove_me({{del.query}})">{% trans "remove" %}</a>{% trans "this tag" %} ({{del.count}})</div>
+{% if parents %}
+<div class="parents">
+<p>Verallgemeinere zu...</p>
+{% for parent,count in parents %}
+<a href="" id="{{parent.id}}" onclick="return replace_me({{tag.id}},{{parent.id}})" >{{parent.text}}({{count}})</a>
+{% endfor %}
+</div>
+{% endif %}
+{% if children %}
+<div class="children">
+<p>Spezifiziere zu...</p>
+{% for child, count in children %}
+<a href="" id="{{child.id}}" onclick="return replace_me({{tag.id}},{{child.id}})" >{{child.text}}({{count}})</a>
+{% endfor %}
+</div>
+{% endif %}

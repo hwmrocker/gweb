@@ -1,0 +1,457 @@
+{% load i18n %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+{% block html %}
+<head>
+<title>{% block title %}Wilsonfontein Hunting Farm{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/screen.css" />
+<script src="{{MEDIA_URL}}js/jquery-1.4.1.min.js" type="text/javascript"></script>
+<script src="{{MEDIA_URL}}js/jquery-ui-1.8.8.full.min.js" type="text/javascript"></script>
+<script src="{{MEDIA_URL}}fancybox/jquery.fancybox-1.3.1.js" type="text/javascript"></script>
+<script src="{{MEDIA_URL}}fancybox/jquery.easing-1.3.pack.js" type="text/javascript"></script>
+<script src="{{MEDIA_URL}}js/jquery.autocomplete.js" type="text/javascript"></script>
+<script src="{{MEDIA_URL}}js/jquery-cookie.js" type="text/javascript"></script>
+
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}fancybox/jquery.fancybox-1.3.1.css" />
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/htags.css" />
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/jquery.autocomplete.css" />
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/jquery-ui-1.8.8.custom.css" />
+<!--[if IE]><script type="text/javascript">
+function warn(){
+    if ( $.cookie('warn') == null ){
+        $.fancybox({
+		    'width'				: '75%',
+		    'height'			: '90%',
+            'autoScale'     	: false,
+            'transitionIn'		: 'none',
+		    'transitionOut'		: 'none',
+		    'type'				: 'iframe',
+		    'href'              : '/warning'
+	    });
+	    $.cookie('warn','nein');
+    }
+	return false;
+}
+</script><![endif]-->
+<![if !IE]><script type="text/javascript">
+function warn(){
+    return false
+}
+</script>
+<![endif]>
+
+<script type="text/javascript">
+
+$(window).load(function(){
+    //alert("haha");
+    //var h = $(".main").height() + $(".main").position().top
+    var h = $(document).height()
+    $(".menu").css({height:h+"px"})
+    $(".menu_helper").css({height:h+"px"})
+    warn();
+});
+
+$(window).resize(function(){
+    var h = $(document).height()
+    $(".menu").css({height:h+"px"})
+    $(".menu_helper").css({height:h+"px"})
+    var w = $(document).width()
+    //alert(w+"hhhh")
+    if ( w < 1000 ){
+        //alert("w = "+w+" too small")
+        if (w < 700 ){
+            //alert("Your screen window size is too small to render this webpage correctly. Try Increase the window size.");
+        }
+        w = w - 400;
+        $("div.content").css({width:w+"px"});
+        w = w - 50;
+        $("div.album_thumbs").css({width:w+"px"});
+        
+    } else {
+        $(".content").css({width:"600px"});
+        $("div.album_thumbs").css({width:"550px"});
+    }
+});
+$(document).ready(function(){
+{% block js_document_ready_overwrite %}
+    $(".menuitem").not(".selected").fadeTo("fast",0.6);
+
+    $(".menuitem").not(".selected").hover(
+        function(){
+            $(this).css({opacity:"0.9"});
+            //$(this).stop(True,True).css({opacity:"0.9"});
+            //$(this).fadeTo("fast",1);
+        },
+        function(){
+            $(this).css({opacity:"0.6"});
+            //$(this).stop(True,True).css({opacity:"0.9"});
+            //$(this).fadeTo("fast",0.5);
+        }
+    );
+    var w = $(document).width();
+    if ( w < 1000 ){
+        //alert("w = "+w+" too small")
+        if (w < 700 ){
+            //alert("Your screen window size is too small to render this webpage correctly. Try Increase the window size.");
+        }
+        w = w - 400;
+        $("div.content").css({width:w+"px"});
+        w = w - 50;
+        $("div.album_thumbs").css({width:w+"px"});
+        
+    } else {
+        $(".content").css({width:"600px"});
+        $("div.album_thumbs").css({width:"550px"});
+    }
+
+{% endblock %}
+{% block js_document_ready %}
+	$("a[rel=example_group]").fancybox({
+		'transitionIn'		: 'elastic',
+		'transitionOut'		: 'elastic',
+		'titlePosition' 	: 'inside',
+	});
+{% endblock %}
+});
+
+{% block js_other_functions %}
+{% endblock %}
+</script>
+
+
+
+</head>
+<body {% block body_parameters %}{% endblock %}>
+{% block body %}
+<div class="menu left">
+{% block menu_left %}
+	<a href="home">
+    <div class="menuitem" >
+    	<div class="menulogo leo"></div>
+		<div class="menutext home"> </div>
+    </div></a>
+
+    <div class="menuitem" >
+	    <div class="menulogo world"></div>
+	    <div class="menutext location"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo kudu"></div>
+	    <div class="menutext hunt"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo fire"></div>
+	    <div class="menutext recreation"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo history"></div>
+	    <div class="menutext history"> </div>
+    </div>
+
+{% endblock%}
+</div>
+<!--[if IE]><div class="menu_helper_ie"></div><![endif]-->
+<![if !IE]><div class="menu_helper "></div><![endif]>
+
+<div class="menu right">
+<div class="menuitem selected"><div class="menutextpos stdcursor">{% if user.is_authenticated %}{% trans "Hello" %} {{user.get_full_name}} <a href="{% url logout %}">{% trans "logout" %}</a>{% else %}<a href="{% url login %}">{% trans "login" %}</a>{% endif %}</div></div>
+<div class="menuitem selected" ><div class="menutextpos"><form action="/i18n/setlang/" method="post">
+{% csrf_token %}
+<input name="next" type="hidden" value="{{request.path}}?redirect=foo{% block nextval %}{% endblock %}" />
+<!--<select name="language">
+{% for lang in LANGUAGES %}
+<option value="{{ lang.0 }}"{% if lang.0 in LANGUAGE_CODE or LANGUAGE_CODE in lang.0 %} selected{% endif %} >{{ lang.1 }}</option>
+{% endfor %}
+</select>
+<input type="submit" value="Go" />-->
+{% for lang in LANGUAGES %}
+<input type="submit" value="{{ lang.0 }}" name="language" class="btn {{ lang.0 }}{% if lang.0 in LANGUAGE_CODE or LANGUAGE_CODE in lang.0 %} selected" disabled="foo{% endif %}" />
+{% endfor %}
+</form></div></div>
+{% block menu_right %}
+	<div class="menuitem" >
+	    <div class="menulogo photos"></div>
+	    <div class="menutext photos"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo price"></div>
+	    <div class="menutext price"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo dedication"></div>
+	    <div class="menutext dedication"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo news"></div>
+	    <div class="menutext news"> </div>
+    </div>
+
+    <div class="menuitem" >
+	    <div class="menulogo contact"></div>
+	    <div class="menutext contact"> </div>
+    </div>
+{% endblock %}
+</div>
+
+
+
+<div class="main"><div class="content">
+{% block header %}
+{% endblock %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% block content %}
+
+<h2 class="u"> Preisliste</h2>
+<hr>
+<br> Aktuelle Preise erhalten sie auf Anfrage, &uuml;ber <a href="kontakt.htm"><b>Kontakt</b></a> oder Sie mailen mir direkt: <b>namibhunt@hotmail.com</b>
+<h2>Wilsonfontein Jagdfarm</h2>
+<b><a href="preisliste.pdf" target="_blank">---Preisliste als PDF-Datei downloaden---</a></b>
+<p>Gejagt wird auf der Farm Wilsonfontein, 28942 ha am Namibrand. KEINE Gatterjagd. Lizenzierter Jagdf&uuml;hrer.<br> Bekannt wegen der gro&szlig;en Springb&ouml;cke (bis 45 cm) und der einmaligen Landschaft.</p>
+<h3>Unterbringung / Dienstleistung:</h3>
+
+<p>Zwei Zweibettzimmer mit Dusche und WC<br> Zwei Zweibettzimmer mit Gemeinschaftsdusche und WC</p>
+<p>Vollverpflegung, nicht alkoholische Getr&auml;nke. W&auml;schedienst<br> Kein Strom vorhanden Nur &Ouml;l und Gaslampen,<br> Abh&auml;uten, Rohzubereitung und Transport der Troph&auml;en zum Spediteur oder Pr&auml;parator.<br> Jagdwagen, Jagdf&uuml;hrer und F&auml;hrtenleser.<br> Mobilfunk empfang am Haus.<br> Bogenjagd m&ouml;glich.</p>
+
+
+	<p>
+		Image gallery (ps, try using mouse scroll wheel)<br />
+
+		<a rel="example_group" href="/media/photo/farm/4x4.jpg" title="Lorem ipsum dolor sit amet<a href='google.de'>google</a>"><img alt="" src="/media/thumbs/farm/4x4.jpg" /></a>
+
+		<a rel="example_group" href="/media/photo/farm/giraffe.jpg" title=""><img alt="" src="/media/thumbs/farm/giraffe.jpg" /></a>
+
+		<a rel="example_group" href="/media/photo/farm/Schildkroete3.jpg" title=""><img alt="" src="/media/thumbs/farm/Schildkroete3.jpg" /></a>
+	
+	<a rel="example_group" href="/media/photo/farm/kurzes_horn.jpg" title="<b>kurzes Horn</b><br>Dieser Bock ist schon sehr alt, man kann an seine abgenutzten Hoerner sehen, dass er schon viele Kaempfe hinter sich hatte."><img alt="" src="/media/thumbs/farm/kurzes_horn.jpg" /></a>
+	</p>
+
+<p>Maximum vier J&auml;ger.</p>
+
+ <b>Tagess&auml;tze :</b><br>
+<table border="0" width="80%">
+<tr>
+ <td align="left">Ruhetag / Begleitperson</td>
+ <td align="right" colspan="2">90 &euro;</td>
+</tr>
+<tr>
+ <td align="left">Jagdtag , Doppelzimmer</td>
+ <td align="left">1:1</td>
+ <td align="right">180 &euro;</td> </tr>
+<tr>
+ <td align="left">Jagdtag , Doppelzimmer</td>
+ <td align="left">2:1@</td>
+ <td align="right">160 &euro;</td>
+</tr>
+<tr>
+ <td align="left">Flughafentransfer / Returntrip (pro Gruppe)</td>
+ <td align="right" colspan="2">200 &euro; / 200 &euro;</td>
+</tr>
+<tr>
+ <td align="left">Angeltrips, Einkaufs- und sonstige Rundfahrten (pro km)</td>
+ <td align="right" colspan="2">0.8 &euro;</td>
+</tr>
+</table><br>
+<b>Troph&auml;en Eigenjagd:</b><br>
+<table border="0" width="80%">
+<tr>
+ <td width="50%">
+  <table width="100%">
+   <tr>
+     <td align="left">B&auml;renpavian</td>
+     <td align="right">50 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Keiler</td>
+     <td align="right">390 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Kudu</td>
+     <td align="right">700 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Klippspringer</td>
+     <td align="right">650 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Lux</td>
+     <td align="right">250 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Oryx</td>
+     <td align="right">450 &euro;</td>
+   </tr>
+  </table>
+ </td>
+ <td width="50%">
+  <table width="100%">
+      <tr>
+     <td align="left">Springbock</td>
+     <td align="right">380 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Strau&szlig;</td>
+     <td align="right">380 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Steinb&ouml;ckchen</td>
+     <td align="right">210 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Schakal</td>
+     <td align="right">FREI</td>
+   </tr>
+   <tr>
+     <td align="left">Wildkatze</td>
+     <td align="right">100 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Bergzebra</td>
+     <td align="right">650 &euro;</td>
+   </tr>
+  </table>
+ </td>
+</tr>
+</table>
+
+<b>Troph&auml;en Konzessionsjagd (ca 250 km entfernt):</b><br>
+<table border="0" width="80%">
+<tr>
+ <td width="50%">
+  <table width="100%">
+   <tr>
+     <td align="left">Kudu</td>
+     <td align="right">670 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Oryx</td>
+     <td align="right">400 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Hartebeest</td>
+     <td align="right">520 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Streifen-Gnu</td>
+     <td align="right">890 &euro;</td>
+   </tr>
+  </table>
+ </td>
+ <td width="50%">
+  <table width="100%">
+      <tr>
+     <td align="left">Wei&szlig;schwanz-Gnu</td>
+     <td align="right">990 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Ducker</td>
+     <td align="right">280 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Steinb&ouml;ckchen</td>
+     <td align="right">270 &euro;</td>
+   </tr>
+   <tr>
+     <td align="left">Warzenschwein</td>
+     <td align="right">360 &euro;</td>
+   </tr>
+  </table>
+ </td>
+</tr>
+</table>
+
+<p>Leihwaffen sind nicht vorhanden. Jeder J&auml;ger kann zwei Troph&auml;en jeder Wildart erlegen<br> Angeschwei&szlig;tes und trotz gewissenhafter Nachsuche nicht gefundenes Wild gilt als Abschuss.<br> Jeder J&auml;ger kann zwei Troph&auml;en jeder Wildart erlegen.<br> Internationaler F&uuml;hrerschein ist bei Selbstfahrer notwendig.<br> Nicht eingeschlossen sind Hin- und R&uuml;ckflug, Flughafensteuer, Trinkgelder, Hotelunterkunft bei An- und Abreise, Verpackung, Versicherung und Versand der Troph&auml;en. </p><br>
+<b>Buchung:</b>
+<p>Eine Anzahlung von 500 &euro; pro Person wird bei der Buchung f&auml;llig.<br> Einzuzahlen auf mein Konto: Bitte &uuml;ber <a href="kontakt.htm"><b>Kontakt</b></a> erfragen</p>
+
+<p>Kopie des Zahlungsbelegs bitte mir als Fax oder per Post zusenden.<br> Bei Empfang der Einzahlung tritt die Buchung in Kraft.<br> F&uuml;r die Buchung sind die Namen der Personen mit Adresse, sowie das genaue An- und Abreisedatum n&ouml;tig.</p>
+
+<b>Versicherung:</b>
+<p>F&uuml;r eventuelle Verluste, Verletzung, Unf&auml;lle, Krankheiten, Versp&auml;tung, etc. k&ouml;nnen wir leider keine Haftung &uuml;bernehmen.<br> Entsprechende Versicherungen werden Empfohlen.</p>
+
+<b>Zahlungs- und Stornobedingungen:</b>
+<p>Abrechnungen der Troph&auml;en und weiteren Leistungen am Abreisetag.<br> Bar in Euro oder Euroreiseschecks, US Dollar, US-D-Reiseschecks.<br> Geb&uuml;hren f&uuml;r &Uuml;berweisungen und SWIFT &Uuml;berweisungen tr&auml;gt der Jagdgast.<br> Die Anzahlung verf&auml;llt bei Stornierung, es sei denn es kann ein Ersatz-Gast gebucht werden.</p>
+
+<br>
+<h3>Tagesausfl&uuml;ge auf Wilsonfontein:</h3>
+<p>Individuell zusammengestellte Fahrten z.B. Zum Feigenbaum, Stahlhelm, zur Hottentottenkirche, Badewanne, Mineraliensuche, zum Bullenauge, Sundowner am goldenem Bischofshut, zu den Wei&szlig;en H&auml;nden, zur Alten Buschmannst&ouml;pferei, zur Teufelsschlucht oder zu den Kokerb&auml;umen werden angeboten.</p>
+<p>Preis je Gruppe 0,50&euro; pro gefahrenen Kilometer und &euro; 13 pro Stunde</p>
+<b>Camping:</b>
+<p>7 &euro; pro Person pro &Uuml;bernachtung. Kinder unter 10 Jahren frei.<br> Campingpl&auml;tze haben keinerlei Anlagen. Duschen Toiletten und Wasser nur am Haus.</p>
+
+<b>Photosafaris Landesweit:</b> nur w&auml;hrend oder gleich nach der Jagd Preise pro Tag <table>
+<tr>
+ <td>1 Person</td>
+ <td>300 &euro;</td>
+</tr>
+<tr>
+ <td>2 Personen</td>
+ <td>260 &euro; @</td>
+</tr>
+<tr>
+ <td>3 Personen</td>
+ <td>230 &euro; @</td>
+</tr>
+<tr>
+ <td>4 Personen</td>
+ <td>190 &euro; @</td>
+</tr>
+<tr>
+ <td>5 Personen</td>
+ <td>170 &euro; @</td>
+</tr>
+<tr>
+ <td>6 Personen</td>
+ <td>160 &euro; @</td>
+</tr>
+</table>
+
+<p><b>Eingeschlossen:</b> Vollpension im D.Zimmer, Fahrzeug, Fahrer <br>
+<b>Nicht Eingeschlossen:</b> Eintrittsgelder , Trinkgelder, alkoholische Getr&auml;nke</p>
+
+<br><br>
+
+
+<!--[if IE]><p>You are using Internet Explorer.</p><![endif]-->
+<![if !IE]><p>You are not using Internet Explorer.</p><![endif]>
+
+<!--[if IE 7]><p>Welcome to Internet Explorer 7!</p><![endif]-->
+<!--[if !(IE 7)]><p>You are not using version 7.</p><![endif]-->
+
+<!--[if gte IE 7]><p>You are using IE 7 or greater.</p><![endif]-->
+<!--[if (IE 5)]><p>You are using IE 5 (any version).</p><![endif]-->
+<!--[if (gte IE 5.5)&(lt IE 7)]><p>You are using IE 5.5 or IE 6.</p><![endif]-->
+<!--[if lt IE 5.5]><p>Please upgrade your version of Internet Explorer.</p><![endif]-->
+
+<!--[if true]>You are using an <em>uplevel</em> browser.<![endif]-->
+<![if false]>You are using a <em>downlevel</em> browser.<![endif]>
+
+<!--[if true]><![if IE 7]><p>This nested comment is displayed in IE 7.</p><![endif]><![endif]-->
+
+
+{% endblock %}
+{% block footer %}
+{% endblock %}
+
+</div></div>
+<script type="text/javascript">
+
+
+
+$("#whut").delay(1000).click();
+</script>
+{% endblock %}
+</body>
+{% endblock %}
+</html>

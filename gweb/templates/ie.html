@@ -1,0 +1,22 @@
+{% extends "wilson/wilson.html" %}
+{% load i18n %}
+{% block html %}
+<head>
+<title>Warning</title>
+<link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}css/screen.css" />
+</head>
+<body>{% blocktrans %}
+<div style="margin-left:auto; margin-right:auto;width:600px;">
+<h1>Warning</h1>
+<h2>Incompatible Browser detected</h2>
+<p>Unfortunately, the Internet Explorer does not support all used design elements. Please visit this site with Firefox or Google Chrome browsers. This is the only way you can ensure that everything is displayed correctly. In addition, You will browse the Web faster and safer. </p>
+
+<table style="margin-left:auto; margin-right:auto;width:500px;">
+<tr><td><a href="http://mozilla.com/firefox"><img src="{{MEDIA_URL}}/pix/firefox-logo.png" alt="firefox-logo" style="height:250px"></a></td>
+    <td><a href="http://google.com/chrome"><img src="{{MEDIA_URL}}/pix/chrome-logo.png" alt="chrome-logo" style="height:250px"></a></td></tr>
+<tr style="text-align:center"><td><a href="http://mozilla.com/firefox">Get Firefox</a></td>
+    <td><a href="http://google.com/chrome">Get Google Chrome</a></td></tr>
+</table>
+</div>{% endblocktrans %}
+</body>
+{% endblock %}

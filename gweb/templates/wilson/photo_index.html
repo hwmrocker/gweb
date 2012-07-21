@@ -1,0 +1,12 @@
+{% extends "wilson/wilson.html" %}
+
+{% block content %}
+<div class="albums">
+{% for album in albums %}
+<p>{{album.lable}}: {% include "wilson/pic/thumb_album.html" with slice1=5 %}</p>
+{% endfor %}
+</div>
+<div class="top_photos"></div>
+<div class="top_authors"></div>
+
+{% endblock %}

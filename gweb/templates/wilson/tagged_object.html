@@ -1,0 +1,176 @@
+{% extends "wilson/wilson.html" %}
+{% load i18n %}
+
+{% block js_other_functions %}
+{% if perms.htags.can_attach_tag %}
+function formatItem_tag_list(row) {
+	return row[2]
+}
+function formatResult_tag_list(row) {
+	return row[1]
+}
+function get_tag(id, text) {
+return '<div class="tag_updating" id="' + id + '" title="' + id + '"><span id="' + id + '" class="remove"><a href="#" alt="remove tag from object">[-]</a></span><span id="' + id + '" class="add hd"><a href="#" alt="attach tag to object">[+]</a></span> ' + text + ' <a href="{% url admin:htags_tag_change 1 %}'.slice(0,-2) + id + '" alt="edit tag" class="edit">[e]</a></div>'
+}
+
+function result_tag(event, data, formatted){
+    //alert(data[0]);
+    
+    new_tag = $(get_tag(data[0], data[1])).insertAfter("div.tag:last");
+    
+    new_tag.children('span.add').click(add_tag);
+    new_tag.children('span.remove').click(rm_tag);
+    new_tag.children('span.add').hide();
+    
+    $.post("{% url wilson.views.attach_tags%}", {"tag_list":"id="+data[0],"object_type":"{{obj.type}}","object_id":"{{obj.id}}"}, handle_add_response);
+    $('input#id_tag_list').val('')
+}
+function handle_form(){
+    var tagname = $('input#id_tag_list').val();
+    if (tagname == ''){
+        return false;
+    }
+    $('input#id_tag_list').val('');
+    //alert("handel: " + tagname);
+    var divtag = $(get_tag("-1",tagname)).insertAfter("div.tag:last");
+    divtag.children('span.add').hide();
+    divtag.children('span.add').click(add_tag);
+    divtag.children('span.remove').click(rm_tag);
+    
+    $.post("{% url wilson.views.attach_tags%}", {"tag_list":"new="+tagname,"object_type":"{{obj.type}}","object_id":"{{obj.id}}"}, handle_new_add_response);
+    
+    return false;
+}
+
+function handle_remove_response(data,code,requestObjects){
+    returncodelist = data.split("|")
+    for (i in returncodelist){
+        elm = returncodelist[i];
+        if (elm != ""){
+            foo = elm.split(":")
+            if (foo[0]=="OK"){
+                var tagdiv = $("div.tag_updating#"+foo[1]);
+                tagdiv.attr("class",'tag_removed');
+                tagdiv.children('span.remove').hide();
+                tagdiv.children('span.add').show();
+            }
+            else{
+                $("div.tag_updating#"+foo[1]).attr("class",'tag_error');
+            }
+        }
+    }
+}
+
+function handle_add_response(data,code,requestObjects){
+    if (data[0] == '<'){
+    } else {
+        returncodelist = data.split("|")
+        for (i in returncodelist){
+            elm = returncodelist[i];
+            if (elm != ""){
+                foo = elm.split(":")
+                if (foo[0]=="OK"){
+                    var tagdiv = $("div.tag_updating#"+foo[1]);
+                    tagdiv.attr("class",'tag');
+                    tagdiv.children('span.add').hide();
+                    tagdiv.children('span.remove').show();
+                }
+                else{
+                    $("div.tag_updating#"+foo[1]).attr("class",'tag_error');
+                }
+            }
+        }
+    }
+}
+
+function handle_new_add_response(data,code,requestObjects){
+    returncodelist = data.split("|")
+    for (i in returncodelist){
+        elm = returncodelist[i];
+        if (elm != ""){
+            foo = elm.split(":")
+            if (foo[0]=="OK"){
+                $("div.tag_updating#-1:contains("+foo[2]+")").attr({'class': 'tag',id: foo[1]});
+                $("div.tag_updating#" + foo[1]).children('a.edit').attr('href','/tag/'+foo[1]);
+                $("div.tag_updating#" + foo[1]).children('span.remove').click(rm_tag);
+                $("div.tag_updating#" + foo[1]).children('span.add').click(add_tag);
+                $("div.tag_updating#" + foo[1]).children('span.add').hide();                
+            }
+            else{
+                $("div.tag_updating#"+foo[1]).attr("class",'tag_error');
+            }
+        }
+    }
+}
+
+function rm_tag(){
+	    //alert($(this).attr("id"));
+	    $(this).parent().attr("class",'tag_updating');
+	    $.post("{% url wilson.views.detach_tags%}", {"tag_list":"id="+$(this).parent().attr('id'),"object_type":"{{obj.type}}","object_id":"{{obj.id}}"}, handle_remove_response);
+}
+
+function add_tag(){
+	    //alert($(this).attr("id"));
+	    $(this).parent().attr("class",'tag_updating');
+	    $.post("{% url wilson.views.attach_tags%}", {"tag_list":"id="+$(this).parent().attr('id'),"object_type":"{{obj.type}}","object_id":"{{obj.id}}"}, handle_add_response);
+}
+{% endif %}
+{% endblock %}
+
+{% block js_document_ready %}
+{% if perms.htags.can_attach_tag %}
+    $("input[id='id_tag_list']").autocomplete(
+        "/ajax/tag",{
+		formatItem: formatItem_tag_list,
+		formatResult: formatResult_tag_list,
+		dataType:'text',
+		selectFirst: false,
+		mustMatch: false,
+	});
+	$("input[id='id_tag_list']").result(result_tag);
+	
+	$("div.tag span.remove").click(rm_tag);
+	$("div.tag span.add").click(add_tag);
+	$("div.tag span.add").hide();
+{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% block tagged_object_info %}
+
+    {% endblock %}
+    
+    <div class ="tag_info">
+    <h3>{% trans "attached Tags" %}:</h3>
+    <div class="tag" style="display:none">&nbsp;</div>
+    {% if obj.tags.all %}
+	    {% for tago,  tagc in obj.get_tags.items %}{% with tago.get_representative_tag as tag %}
+	    <div class="tag" id="{{tag.id}}" title="{{tag.id}}">
+		{% if perms.htags.can_attach_tag %}<span id="{{tag.id}}" class="remove"><a href="#" alt="remove tag from object">[-]</a></span><span id="{{tag.id}}" class="add hd"><a href="#" alt="attach tag to object">[+]</a></span>{% endif %} {{ tag.text }} {% if perms.htags.can_attach_tag %}<a href="{% url admin:htags_tag_change tag.id %}" alt="edit tag" class="edit">[e]</a>{% endif %} 
+	    </div>
+	    {% endwith %}{% endfor %}
+	    <p>
+	    
+    {% endif %}
+    <!----><br clear="left">
+		{% if perms.htags.can_attach_tag %}
+		<form name="" onSubmit="return handle_form()"> 
+        <p><label for="id_tag_list">Add tag:</label> <input id="id_tag_list" name="tag_list" maxlength="200" type="text"/> <input type="submit" value="[+]" class="" /></p></form>{% endif %} <!---->
+    {% if obj.tags.all %}
+        {% if tag_list %}
+		{% if perms.htags.can_attach_tag %}
+		<h4>You will find this ... also with one of these tags:</h4><p>(
+		{% for tag in tag_list %}
+		    <a href='/tag/{{tag.id}}'>{{ tag.text }}</a>
+		    {% if not forloop.last %}, {% endif %} 
+		{% endfor %}
+		)<br></p>
+	    {% endif %}{% endif %}
+	{% else %}
+	    {% trans "There are no Tags attached." %}
+    {% endif %}
+    </div>
+    <br>
+
+
+{% endblock %}

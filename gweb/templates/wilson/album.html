@@ -1,0 +1,231 @@
+{% extends "wilson/wilson.html" %}
+{% load url from future %}
+{% load i18n %}
+{% block content %}
+<h1>{{album.description.title|default:album.label}}</h1>
+<p>{{album.description.description}}</p>
+{% if album.id == 0 %}
+<div id='readable'>{{album.query|safe}}</div>
+<form method='get' action=''>
+<input name="query" id="q" value='{{ album.query }}' size="90">
+<button>OK</button>
+</form>
+<input name="tagfinder" id="tagfinder" value="" size="30"><br>
+<input type="radio" name="C" value="and" checked>and<br>
+<input type="radio" name="C" value="or">or<br>{% if simple_mode %}
+{% else %}<input type="radio" name="C" value=" ">' '<br>
+<input type="radio" name="C" value="and !(">not<br>{% endif %}
+<div id="tag_history">
+
+</div>
+{% else %}
+{% url "wilson:custom_album" query=album.queryurl lang=LANGUAGE_CODE as album_search_url %}
+<a href="{{album_search_url}}">{% trans "search this album" %}</a>
+{% endif %}
+
+
+<div class="album_thumbs" style="clear:both;">
+{% for id,pic,pic_url in album_pics.object_list %}
+
+<a href="{{pic_url}}"><img src="{{pic.thumb.url}}" alt="{{pic.description.title}}" class="" id="{{album.queryurl}}"></a>  
+{% endfor%}
+</div>
+
+
+{% if album_pics.has_other_pages %}
+<div class="pagination2">
+<span>{% trans "Jump to page"%}</span>
+{% for page_id in album_pics.page_range %}
+{% if page_id != album_pics.number %}{% if album.id == 0%}
+{% url "wilson:custom_album_page" page=page_id query=album.queryurl lang=LANGUAGE_CODE as album_page_url %}
+{% else %}
+{% url "wilson:album_page" page=page_id album_id=album.id name=album.title|slugify lang=LANGUAGE_CODE as album_page_url %}
+{% endif %}
+<a href="{{album_page_url}}">{{page_id}}</a>
+{% else %}
+{{ page_id }}
+{% endif %}
+{% endfor %}
+</div>{% endif %}
+{% endblock %}
+
+
+{% block nextval%}{% spaceless %}
+{% if album.id == 0 %}&query={{album.queryurl}}{% endif %}
+{% endspaceless %}{% endblock %}
+
+
+{% block js_document_ready %}
+{{block.super}}
+$("input[id='tagfinder']").autocomplete(
+        "/ajax/tag",{
+		formatItem: formatItem_tag_list,
+		formatResult: formatResult_tag_list,
+		dataType:'text',
+		selectFirst: false,
+		mustMatch: false,
+	});
+$("input[id='tagfinder']").result(handle_result);
+$("input#q").keyup(handle_change)
+
+
+var str = $('input#q').val();
+var regex =/id=[0-9]+/g;
+var li = str.match(regex);
+var l =[]
+for (idx in li){ 
+    if (!(li[idx].slice(3) in $wilsoncache.tagid_ref)){
+        l.push(li[idx].split('=')[1]);
+    }
+}
+var str=l.join(',');
+$.post("/ajax/get_id", { ids: str },
+    function(data){
+        var li = data.split("|");
+        
+        for (idx in li ){
+            var tmp = li[idx].split(":");
+            var id=tmp[0];
+            var tagname=tmp[1];
+            if (!(id in $wilsoncache.tagid_ref)){
+                $wilsoncache.tagid_ref[id]=tagname;
+            }
+        }
+        handle_change();
+    });
+ 
+ 
+ 
+{% if simple_mode %}
+$('input:radio[name="C"]').click(function () {
+    if ($(this).val()=='and'){
+        mk_and();
+    }else{
+        mk_or();
+    }
+});
+{% endif %}
+{% endblock %}
+
+{% block js_other_functions %}
+{{block.super}}
+
+$wilsoncache.tagid_ref={}
+$wilsoncache.dialogs={}
+function formatItem_tag_list(row) {
+	return row[2]
+}
+function formatResult_tag_list(row) {
+	return row[1]+', id='+row[0]
+}
+{% if simple_mode %}
+function mk_or(){
+    $('input#q').val($('input#q').val().replace(/ and /g,' or '));
+    handle_change();
+}
+
+function mk_and(){
+    $('input#q').val($('input#q').val().replace(/ or /g,' and '));
+    handle_change();
+}
+{% endif %}
+
+function handle_result(event, data, formatted){
+    //$(get_tag(data[0], data[1])).insertAfter("div.tag:last");
+    var pad=' '+$('input:radio[name="C"]:checked').val()+' ';
+    if ($('input#q').val() == ''){
+        pad = ''
+    }
+    $('input#q').val($('input#q').val()+pad+'id='+data[0]);
+    if (!(data[0] in $wilsoncache.tagid_ref)){
+        $wilsoncache.tagid_ref[data[0]]=data[1];
+    }
+    $('input#tagfinder').val('');
+    handle_change();
+}
+
+function get_tag_name(id){
+    var retval = $wilsoncache.tagid_ref[id]
+    if (retval){
+        return retval;
+    }else{
+        $.post("/ajax/get_id", { ids: id },
+            function(data){
+                var li = data.split("|");
+                
+                for (idx in li ){
+                    var tmp = li[idx].split(":");
+                    var id=tmp[0];
+                    var tagname=tmp[1];
+                    if (!(id in $wilsoncache.tagid_ref)){
+                        $wilsoncache.tagid_ref[id]=tagname;
+                    }
+                }
+                handle_change();
+            });
+        return '';
+    }
+}
+
+function handle_change(){
+    var str = $('input#q').val();
+    var retstr = "";
+    var regex =/id=[0-9]+/g;
+    var li = str.match(regex);
+    {% if simple_mode %}
+    $('input#q').val($('input#q').val().replace(/[()!]/g,''));
+    //$('input#q').val($('input#q').val().replace(/\)/g,''));
+    //$('input#q').val($('input#q').val().replace(/!/g,''));
+    {% endif %}
+    var last = 0
+    for (idx in li){
+        var delta = str.search(li[idx])
+        var pos = last+delta
+        last = pos+li[idx].length
+        //step 1: add slice to next id=... to retstr
+        //step 2: shorten original str but save the original position
+        retstr = retstr + str.slice(0,delta)
+        str = str.slice(delta+li[idx].length)
+        
+        retstr = retstr + '<a href="#" onclick="return test('+li[idx].slice(3)+','+pos+')" pos="'+pos+'">'+get_tag_name(li[idx].slice(3))+'</a>';
+    }
+    $('div#readable').html(retstr);
+}
+function test(tag_id,pos){
+    if ( tag_id in $wilsoncache.dialogs ){
+        var $dialog = $wilsoncache.dialogs[tag_id];
+        $dialog.dialog('open');
+        return false;
+    }else{
+        var tmp = $('input#q').val()
+        var q = tmp.slice(0,pos) + '<>' + tmp.slice(pos+3+tag_id.toString().length)
+        $.post("/ajax/get_tag_info", { id: tag_id, query: q },
+        function(data){
+            var $dialog = $('<div></div>').html(data)
+		    .dialog({
+			    autoOpen: true,
+			    title: $wilsoncache.tagid_ref[tag_id]
+		    });
+		    //$wilsoncache.dialogs[tag_id]=$dialog;
+		    //return test(tag_id);
+        });
+    }
+    return false;
+//alert('haha');
+}
+
+function replace_me(old_id, new_id){
+    var tmp = $('input#'+old_id).val();
+    tmp = tmp.replace('<>','id='+new_id);
+    $('input#q').val(tmp)
+    $('form').submit();
+    return false;
+}
+
+function remove_me(new_query){
+    $('input#q').val(new_query);
+    $('form').submit();
+    return false;
+}
+
+{% endblock %}

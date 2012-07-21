@@ -1,0 +1,19 @@
+{% extends "wilson/photo.html" %}
+{% load url from future %}
+{% load i18n %}
+{% with obj as picture %}
+{% block content %}
+{{block.super}}
+{% endblock %}
+
+
+{% block after_picture %}
+<div class="album_slice">
+{% for id,pic,pic_url in album.slice %}
+<a href="{{pic_url}}"><img src="{{pic.thumb.url}}" alt="{{pic.description.title}}" class="{% if pic.id == obj.id %}self{% endif %}"></a>  
+{% endfor%}</div>
+{% if album_url %}
+<div><p><a href="{{album_url}}">{% trans "Back" %} </a> {% trans "to the album."%}</p></div>
+{% endif %}
+{% endblock %}
+{% endwith %}

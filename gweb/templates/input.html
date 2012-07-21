@@ -1,0 +1,46 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="http://gladis.org/media/css/screen.css" />
+<link rel="stylesheet" type="text/css" href="http://gladis.org/media/css/jquery.autocomplete.css" />
+<script src="http://gladis.org/media/js/jquery-1.4.1.min.js" type="text/javascript"></script>
+<script src="http://gladis.org/media/js/jquery.autocomplete.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+String.prototype.strip = function() {
+  return this.replace(/^\s+|\s+$/g, "");
+};
+
+function formatItem_bla(bla,row) {
+	return row[2]
+}
+function formatResult_bla(bla,row) {
+	return row[1]
+}
+
+$(document).ready(function(){
+    $("input[id='id_tag_list']").autocomplete({
+        url:'http://gladis.org/ajax/tag',
+		//delay:10,
+		//minChars:1,
+		//matchSubset:1,
+		//autoFill:true,
+		//matchContains:1,
+		//cacheLength:1,
+		//selectFirst:true,
+		//maxItemsToShow:10,
+		//onItemSelect:selectItem_bla,
+		formatItem: formatItem_bla,
+		formatResult: formatResult_bla,
+		dataType:'text'
+	}); 
+});
+</script>
+</head>
+
+    <body>
+    <form action="" method="post"> 
+    <p><label for="id_tag_list">Tag list:</label> <input id="id_tag_list" name="tag_list" maxlength="200" type="text" /> </p> 
+    <input type="submit" value="Submit" /> 
+    </form> 
+    </body>
+</html>

@@ -1,0 +1,45 @@
+{% extends "wilson/wilson.html" %}
+{% load url from future %}
+{% load i18n %}
+{% block content %}
+<h1>{% trans "Photos" %}</h1>
+<div class="albums">
+<div class="blockdesc">{% trans "sort by Album" %}</div>
+{% for album in albums %}{% spaceless %}
+
+{% url "wilson:album" album_id=album.id lang=LANGUAGE_CODE name=album.title|slugify as album_url %}
+{% url "wilson:album_picture" album_id=album.id picture_id=album.representative.albumid lang=LANGUAGE_CODE  name=album.title|slugify as album_pic_url %}
+
+<div class="album">
+   <div class="album_title"><a href="{{album_url}}">{{album.title}}:</a></div>
+   <a href="{{album_pic_url}}"><img src="{{album.representative.thumb.url}}" alt="{{album.representative.description.title}}" class="album_image"></a>
+   <p class="album_description">{{album.description.description|truncatewords:20}}</p>
+</div>
+{% endspaceless %}{% endfor %}
+</div>
+
+<!--
+<div class="top_photos photo_block">
+<div class="blockdesc">{% trans "Top photos" %}</div>
+
+
+<div class="photo_block">
+{% for picture in top_pictures %}{% spaceless %}
+{% include "wilson/pic/thumb_pic.html" %}
+{% endspaceless %}{% endfor %}
+</div></div>
+-->
+<!--
+<div class="top_authors photo_block">
+<div class="blockdesc">{% trans "sort by photographer" %}</div>
+{% for author in authors %}{% spaceless %}
+
+<div class="author">
+   <div class="album_title"><a href="{{album_url}}">{{album.title}}:</a></div>
+   <a href="{{album_pic_url}}"><img src="{{album.representative.thumb.url}}" alt="{{album.representative.description.title}}" class="album_image"></a>
+   <p class="album_description">{{album.description.description|truncatewords:20}}</p>
+</div>
+{% endspaceless %}{% endfor %}
+</div>-->
+
+{% endblock %}

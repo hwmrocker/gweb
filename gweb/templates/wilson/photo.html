@@ -1,0 +1,44 @@
+{% extends "wilson/tagged_object.html" %}
+{% load markup %}
+{% load url from future %}
+{% load i18n %}
+{% block title %}{{obj.description.title|default:obj.title}}{% endblock %}
+
+{% block tagged_object_info %}{% with obj as picture %}
+    <h1>{{obj.description.title|default:obj.title}}</h1>
+    {% url "wilson:photo" photo_id=obj.id lang=LANGUAGE_CODE as permalink %}
+    <span class="permalink"><a href='{{permalink}}' alt='Permalink'>{% trans "A permanent link to this photo." %}</a></span>
+    {% if perms.wilson %}
+    <span class="edit"><a href="{% url "admin:wilson_picture_change" obj.id%}" alt="{% trans "edit" %}">{% trans "edit this photo" %}</a></span>
+    {% endif %}
+    <div class="photo"><div>
+    {% if prev %}<a href="{{prev}}" alt="{% trans "previous photo"%}" ><div class="prev"></div></a>{% endif %}
+    {% if next %}<a href="{{next}}">{% endif %}<div class="photo_content"><img src="{{obj.image.url}}" alt="{{obj.title}}" ></div>{% if next %}</a>{% endif %}
+    {% if next %}<a href="{{next}}" alt="{% trans "next photo"%}" ><div class="next"></div></a>{% endif %}</div>
+   
+    
+    
+    {% include "wilson/pic/picture_description.html" %}{% endwith %}</div>
+{% endblock %}
+
+
+{% block content %}
+{{ block.super }}
+{% block after_picture %}
+{% endblock %}
+{% if perms.wilson %}
+<form action="{% url "wilson:edit_picture" obj.id %}" method="POST">
+<input name="next" type="hidden" value="{{request.path}}" />
+{{obj.picture_form.as_p}}
+
+{% for foo in obj.description_forms %}
+<p>{{foo.0}}:</p>
+{{foo.1.as_p}}
+<hr>
+{% endfor %}
+<input type="submit" value="OK">
+</form>
+{% endif %}
+{% endblock %}
+
+

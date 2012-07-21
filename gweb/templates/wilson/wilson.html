@@ -1,0 +1,40 @@
+{% extends "wilson/base.html" %}
+{% if menu %}{% if menu.right %}
+{% block menu_right %}
+{% with menu.right as menu %}
+{% include "wilson/menu_object.html" %}
+{% endwith %}
+{% endblock %}{# menu_right #}
+{% endif %}{# menu.right #}{% if menu.left %}
+{% block menu_left %}
+{% with menu.left as menu %}
+{% include "wilson/menu_object.html" %}
+{% endwith %}
+{% endblock %}{# menu_left #}
+{% endif %}{# menu.left #}{% endif %}{# menu #}
+
+{% load markup %} {% load wilson_extras %}
+{% block header %}
+{{page.header.content}}
+{% endblock %}
+
+{% block content %}
+{% if page %}
+{{page.content|pic:LANGUAGE_CODE|markdown:"stables"}}
+{% endif %}
+{% endblock %}
+{% block footer %}
+{{page.footer.content}}
+{% endblock %}
+
+{% block js_document_ready %}
+	$("a[class=fancy_pic]").fancybox({
+		'transitionIn'		: 'elastic',
+		'transitionOut'		: 'elastic',
+		'titlePosition' 	: 'inside'
+	});
+{% endblock %}
+
+{% block js_other_functions %}
+$wilsoncache = {}
+{% endblock %}
